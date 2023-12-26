@@ -7,16 +7,15 @@ using System;
 public class FacebookSdkTest : MonoBehaviour
 {
     public Text LogText;
-
     public Button LoginButton;
     public Button LogoutButton;
     public Button PayButton;
     public Button ShareButton;
 
-    void Awake()
+    private void Awake()
     {
         // 初始化
-        FB.Init(() =>
+        /*FB.Init(() =>
         {
             if (FB.IsInitialized)
             {
@@ -27,16 +26,14 @@ public class FacebookSdkTest : MonoBehaviour
             {
                 Debug.Log("Failed to Initialize the Facebook SDK");
             }
-        });
+        });*/
+        FacebookHelper.Init();
     }
 
-    void Start()
+    private void Start()
     {
         LogText.text = "";
-        Application.logMessageReceived += (string condition, string stackTrace, LogType type) =>
-        {
-            LogText.text += condition + "\n";
-        };
+        Application.logMessageReceived += (condition, _, _) => { LogText.text += condition + "\n"; };
 
         LoginButton.onClick.AddListener(DoLogin);
         LogoutButton.onClick.AddListener(DoLogout);
@@ -48,12 +45,11 @@ public class FacebookSdkTest : MonoBehaviour
     {
         if (FB.IsLoggedIn)
         {
-            Debug.Log("You have logined!");
+            Debug.Log("You have logged in!");
             return;
         }
 
-        if (null != AccessToken.CurrentAccessToken &&
-            AccessToken.CurrentAccessToken.ExpirationTime > System.DateTime.Now)
+        if (null != AccessToken.CurrentAccessToken && AccessToken.CurrentAccessToken.ExpirationTime > DateTime.Now)
         {
             // 快速登录
             FB.Android.RetrieveLoginStatus((result) =>
@@ -75,7 +71,7 @@ public class FacebookSdkTest : MonoBehaviour
         else
         {
             // 登录
-            var perms = new List<string>() { "public_profile", "email" };
+            var perms = new List<string>() { "public_profile" };
             FB.LogInWithReadPermissions(perms, (result) =>
             {
                 if (FB.IsLoggedIn)
@@ -115,7 +111,7 @@ public class FacebookSdkTest : MonoBehaviour
 
     public void DoShare()
     {
-        FB.ShareLink(new Uri("https://play.google.com/store/apps/details?id=com.github.android"),
+        /*FB.ShareLink(new Uri("https://play.google.com/store/apps/details?id=com.github.android"),
             callback: (result) =>
             {
                 if (result.Cancelled || !string.IsNullOrEmpty(result.Error))
@@ -132,6 +128,7 @@ public class FacebookSdkTest : MonoBehaviour
                     // Share succeeded without postID
                     Debug.Log("ShareLink success!");
                 }
-            });
+            });*/
+        FacebookHelper.Share();
     }
 }

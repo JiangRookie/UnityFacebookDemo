@@ -17,11 +17,6 @@ public class FacebookHelper
 
     public delegate void OnGetFBInfoFaild();
 
-    internal static void GetMyInfo(Action<string> p, object v)
-    {
-        throw new NotImplementedException();
-    }
-
     public delegate void OnFBInvitedSucceed(string resultJsonStr);
 
     private static string appLinkUrl;
@@ -29,7 +24,7 @@ public class FacebookHelper
     /// <summary>
     /// 初始化
     /// </summary>
-    public static void Init(Action action)
+    public static void Init(Action action = null)
     {
         if (!FB.IsInitialized)
         {
@@ -37,16 +32,9 @@ public class FacebookHelper
             {
                 if (FB.IsInitialized)
                 {
-                    // Signal an app activation App Event
                     FB.ActivateApp();
-                    // Continue with Facebook SDK
-                    // ...
                     FBGetAPPLinkUrl();
-
-                    if (action != null)
-                    {
-                        action();
-                    }
+                    action?.Invoke();
                 }
                 else
                 {
@@ -57,11 +45,7 @@ public class FacebookHelper
         else
         {
             FB.ActivateApp();
-
-            if (action != null)
-            {
-                action();
-            }
+            action?.Invoke();
         }
     }
 
@@ -84,13 +68,13 @@ public class FacebookHelper
     /// </summary>
     public static void LoginResult(Action action)
     {
-        List<string> perms = new List<string>() { "public_profile", "email", "user_friends" };
+        var perms = new List<string>() { "public_profile", "email", "user_friends" };
         FB.LogInWithReadPermissions(perms, (result) =>
         {
             if (FB.IsLoggedIn)
             {
                 // AccessToken class will have session details
-                var aToken = Facebook.Unity.AccessToken.CurrentAccessToken;
+                var aToken = AccessToken.CurrentAccessToken;
 
                 if (action != null)
                 {
@@ -111,7 +95,10 @@ public class FacebookHelper
 //         if (PlayerManager.Ins.IsFaceBook)
 //         {
 // #if UNITY_ANDROID && !UNITY_EDITOR
-//            FB.ShareLink(new Uri("https://play.google.com/store/apps/details?id=" + UpdateManager.Ins.verData.data.googleId), callback: ShareCallback);
+        FB.ShareLink(
+            new Uri(
+                "https://play.google.com/store/apps/details?id=https://play.google.com/store/apps/details?id=com.github.android"),
+            callback: ShareCallback);
 // #elif UNITY_IOS && !UNITY_EDITOR
 //             FB.ShareLink(new Uri("https://apps.apple.com/us/app/face-meme-emoji-gif-maker/id" + UpdateManager.Ins.verData.data.iosId), callback: ShareCallback);
 // #endif
@@ -132,11 +119,11 @@ public class FacebookHelper
 
     private static void ShareCallback(IShareResult result)
     {
-        if (result.Cancelled || !String.IsNullOrEmpty(result.Error))
+        if (result.Cancelled || !string.IsNullOrEmpty(result.Error))
         {
             Debug.Log("ShareLink Error: " + result.Error);
         }
-        else if (!String.IsNullOrEmpty(result.PostId))
+        else if (!string.IsNullOrEmpty(result.PostId))
         {
             // Print post identifier of the shared content
             Debug.Log(result.PostId);
@@ -148,28 +135,8 @@ public class FacebookHelper
         }
     }
 
-    /// <summary>   
-    /// 邀请
-    /// </summary>
-    public static void Invite()
-    {
-        //string message, IEnumerable<string> to = null, IEnumerable<object> filters = null, IEnumerable<string> excludeIds = null, int? maxRecipients = default(int?), string data = "", string title = "", FacebookDelegate<IAppRequestResult> callback = null
-        // FB.AppRequest(APP.facebookID,null/*to*/,null/**/,null);
-
-        //FB.AppRequest("Come play this great game!", null, null, null, null, null, null, 
-        //        delegate (IAppRequestResult result) {
-        //            Debug.Log(result.RawResult); Debug.Log(result.RawResult);
-        //});
-    }
-
-    /// <summary>
-    /// 获取自己的信息
-    /// </summary>
-    /// <param name="onGotFBMyInfo"></param>
     public static void GetMyInfo(OnGotFBMyInfo onGotFBMyInfo = null, OnGetFBInfoFaild onGetFaild = null)
     {
-        //Logger.LogUI("GetMyInfo");
-        //没有授权
         if (FB.IsLoggedIn == false)
         {
             if (onGetFaild != null)
@@ -180,10 +147,8 @@ public class FacebookHelper
             return;
         }
 
-        //Logger.LogUI("API");
         FB.API("me?fields=id,name,picture", HttpMethod.GET, (result) =>
         {
-            //Logger.LogUI(result.RawResult);
             if (onGotFBMyInfo != null)
             {
                 onGotFBMyInfo(result.RawResult);
@@ -191,9 +156,6 @@ public class FacebookHelper
         });
     }
 
-    /// <summary>
-    ///  获取APPLink, 获取失败，TODO
-    /// </summary>
     public static void FBGetAPPLinkUrl()
     {
         FB.GetAppLink((result) =>
@@ -203,7 +165,6 @@ public class FacebookHelper
             Debug.Log("TargetUrl: " + result.TargetUrl);
             Debug.Log("Url: " + result.Url);
             appLinkUrl = result.Url;
-            //Logger.LogUI(appLinkUrl);
         });
     }
 }
