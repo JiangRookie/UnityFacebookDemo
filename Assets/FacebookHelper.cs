@@ -95,7 +95,7 @@ public class FacebookHelper
 //         if (PlayerManager.Ins.IsFaceBook)
 //         {
 // #if UNITY_ANDROID && !UNITY_EDITOR
-        FB.ShareLink(new Uri("https://play.google.com/store/apps/details?id=com.github.android"),
+        FB.ShareLink(new Uri("https://play.google.com/store/apps/details?id=com.github.android"),"Come on and play football with me!",
             callback: ShareCallback);
 // #elif UNITY_IOS && !UNITY_EDITOR
 //             FB.ShareLink(new Uri("https://apps.apple.com/us/app/face-meme-emoji-gif-maker/id" + UpdateManager.Ins.verData.data.iosId), callback: ShareCallback);
